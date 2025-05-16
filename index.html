@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="icon" type="image/png" href="https://sudhanshu934.github.io/birthday-special/popper.png">
     <title>Interactive Birthday Card</title>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -10,17 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         
-      body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background: linear-gradient(135deg, #ffdde1, #ee9ca7);
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-        }
+    
 
         .envelope-container {
             position: relative;
@@ -669,8 +660,7 @@
       background: linear-gradient(135deg, #ffdde1, #ee9ca7, #f8c7d0, #f0e1e1); /* Your custom gradient colors */
       background-size: 400% 400%;
       animation: gradient 15s ease infinite;
-      height: 100vh;
-      margin: 0;
+      
     }
 
     /* Keyframes for smooth gradient transition */
@@ -686,33 +676,6 @@
       }
     }
 
-/* CSS for the Initial Star Burst Effect */
-.burst-particle {
-    position: absolute;
-    pointer-events: none; /* So they don't interfere with clicks */
-    z-index: 15; /* Above envelope content but below modals */
-    opacity: 0; /* Start invisible */
-    /* Star shape using clip-path */
-    width: 18px;
-    height: 18px;
-    background-color: #ffd700; /* Gold */
-    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
-}
-
-@keyframes starBurstAnimation {
-    0% {
-        opacity: 1;
-        transform: scale(0.3) rotate(0deg);
-    }
-    50% {
-        opacity: 0.8;
-        transform: scale(1.2) rotate(180deg);
-    }
-    100% {
-        opacity: 0;
-        transform: scale(0.5) rotate(360deg) translateY(-60px); /* Move upwards as it fades */
-    }
-}
 
 /* CSS for the Envelope Continuous Glow/Pulse Effect */
 .envelope-container.glowing {
@@ -738,33 +701,33 @@
 
     </style>
 </head>
-<body>
-    <div class="max-w-md w-full px-4">
+<body class="min-h-screen flex items-center justify-center bg-pink-100">
+    <div class="max-w-md w-full px-4 py-4">
         <!-- Welcome Screen -->
-        <div id="welcome-screen" class="p-6 md:p-8 mb-6 mt-6 rounded-xl shadow-xl bg-white">
+        <div id="welcome-screen" class="bg-white rounded-xl shadow-xl p-6 text-center">
             <h1 class="text-3xl font-bold birthday-title mb-4">Birthday Card Creator</h1>
             <p class="mb-6">Create a special birthday card with a secret message!</p>
             
             <div class="space-y-4">
                 <div>
                     <label for="recipient-name" class="block text-left text-sm font-medium text-gray-700 mb-1">Recipient's Name:</label>
-                    <input type="text" id="recipient-name" class="input-field text-base" placeholder="Enter name" value="">
+                    <input type="text" id="recipient-name" class="input-field" placeholder="Enter name" value="">
                 </div>
                 
                 <div>
                     <label for="birthday-message" class="block text-left text-sm font-medium text-gray-700 mb-1">Birthday Message:</label>
                     <label for="birthday-message" class="block text-left text-[10px] font-extralight text-gray-700 mb-1">This message will be visible when user will answer the secret question.</label>
-                    <textarea id="birthday-message-input" class="input-field text-base" rows="3" placeholder="Write your birthday wishes here...">Wishing you a wonderful birthday filled with joy, happiness.</textarea>
+                    <textarea id="birthday-message-input" class="input-field" rows="3" placeholder="Write your birthday wishes here...">Wishing you a wonderful birthday filled with joy, happiness.</textarea>
                 </div>
                 
                 <div>
                     <label for="secret-question" class="block text-left text-sm font-medium text-gray-700 mb-1">Secret Question:</label>
-                    <input type="text" id="secret-question" class="input-field text-base" placeholder="Enter a question only they would know" value="">
+                    <input type="text" id="secret-question" class="input-field" placeholder="Enter a question only they would know" value="">
                 </div>
                 
                 <div>
                     <label for="secret-answer" class="block text-left text-sm font-medium text-gray-700 mb-1">Secret Answer:</label>
-                    <input type="text" id="secret-answer" class="input-field text-base" placeholder="Enter the answer to your question" value="">
+                    <input type="text" id="secret-answer" class="input-field" placeholder="Enter the answer to your question" value="">
                 </div>
                 
                 <button id="create-card-btn" class="btn w-full">Create Birthday Card</button>
