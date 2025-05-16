@@ -11,7 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         
-    
+    input,
+textarea,
+select {
+  font-size: 16px; /* Prevents mobile zoom */
+}
+
 
         .envelope-container {
             position: relative;
@@ -596,6 +601,12 @@
                 height: 192.5px;
             }
 
+            input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+            
             .content {
         font-size: inherit; /* Resets to default (desktop) size */
     }
