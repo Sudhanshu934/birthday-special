@@ -1114,6 +1114,7 @@ select {
             messageUnlocked = true;
             hideSecretQuestionModal();
             birthdayMessage.textContent = cardData.message;
+            revealSecretBtn.textContent = 'Celebrate!';
             birthdayMessage.style.opacity = '0';
             birthdayMessage.style.animation = 'none';
             setTimeout(() => {
@@ -1229,6 +1230,24 @@ select {
             createCardBtn.addEventListener('touchend', (e) => { e.preventDefault(); createCard(); });
             createCardBtn.style.cursor = 'pointer';
             checkUrlParams();
+                        // --- START: ADD THIS CODE FOR 'ENTER' KEY ON WELCOME SCREEN ---
+            const welcomeScreenInputs = [
+                recipientNameInput,
+                birthdayMessageInput,
+                secretQuestionInput,
+                secretAnswerInput
+            ];
+
+            welcomeScreenInputs.forEach(input => {
+                input.addEventListener('keypress', function(event) {
+                   
+                    if (event.key === 'Enter') {
+                        event.preventDefault(); 
+                        createCard();        
+                    }
+                });
+            });
+              // --- END: ADD THIS CODE --
         });
 
         envelope.addEventListener('click', (e) => {
