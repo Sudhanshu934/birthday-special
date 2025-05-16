@@ -1080,6 +1080,8 @@ select {
 
                 if (messageUnlocked || !isSharedView) {
                     birthdayMessage.textContent = cardData.message;
+                    revealSecretBtn.textContent = 'Celebrate!';
+
                 } else {
                     birthdayMessage.textContent = `Happy Birthday, ${cardData.name}!`;
                 }
