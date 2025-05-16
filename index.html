@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="icon" type="image/gif" href="https://fonts.gstatic.com/s/e/notoemoji/latest/1f389/512.gif">
+    <title>Interactive Birthday Card</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        
+      body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+
+        .envelope-container {
+            position: relative;
+            width: 400px;
+            height: 275px;
+            cursor: pointer;
+            perspective: 1200px;
+            transition: transform 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            max-width: 90vw;
+            max-height: 60vw;
+        }
+
+        .envelope-container:hover, .envelope-container:active {
+            transform: scale(1.05) rotate(1deg);
+        }
+
+        .envelope-container:hover .click-indicator, .envelope-container:active .click-indicator {
+            opacity: 1;
+        }
+
+        svg.envelope {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .flap {
+            transform-origin: 50% 0;
+            animation: none;
+        }
+
+        .ribbon-left, .ribbon-right {
+            animation: none;
+        }
+
+        .bow-left, .bow-right, .bow-knot {
+            animation: none;
+        }
+
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(18px, 7vw, 24px);
+            font-family: 'Dancing Script', cursive;
+            color: #d81b60;
+            animation: none; 
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .content {
+            position: relative;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(18px, 7vw, 24px);
+            font-family: 'Dancing Script', cursive;
+            color: #d81b60;
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 80%;
+        }
+
+        .click-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(12px, 4vw, 14px);
+            color: #fff;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 16px;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 20;
+            pointer-events: none;
+            font-family: 'Poppins', sans-serif;
+        }
+
+          .envelope-container.open .flap {
+            animation: openFlap 0.6s ease-in-out 1s forwards;
+        }
+
+        .envelope-container.open .ribbon-left {
+            animation: untieRibbonLeft 0.8s ease-in-out forwards;
+        }
+
+        .envelope-container.open .ribbon-right {
+            animation: untieRibbonRight 0.8s ease-in-out forwards;
+        }
+
+        .envelope-container.open .bow-left {
+            animation: unravelBowLeft 0.8s ease-in-out forwards;
+        }
+
+        .envelope-container.open .bow-right {
+            animation: unravelBowRight 0.8s ease-in-out forwards;
+        }
+
+        .envelope-container.open .bow-knot {
+            animation: shrinkKnot 0.8s ease-in-out forwards;
+        }
+
+        .envelope-container.open .content {
+            animation: revealContent 0.5s ease-in-out 1.8s forwards;
+        }
+
+        .envelope-container.closing .flap {
+    animation: closeFlap 0.6s ease-in-out forwards;
+}
+
+.envelope-container.closing .ribbon-left {
+    animation: retieRibbonLeft 0.8s ease-in-out forwards;
+}
+
+.envelope-container.closing .ribbon-right {
+    animation: retieRibbonRight 0.8s ease-in-out forwards;
+}
+
+.envelope-container.closing .bow-left {
+    animation: ravelBowLeft 0.8s ease-in-out forwards;
+}
+
+.envelope-container.closing .bow-right {
+    animation: ravelBowRight 0.8s ease-in-out forwards;
+}
+
+.envelope-container.closing .bow-knot {
+    animation: growKnot 0.8s ease-in-out forwards;
+}
+
+.envelope-container.closing .content {
+    animation: hideContent 0.5s ease-in-out forwards;
+}
+
+@keyframes closeFlap {
+    from {
+        transform: rotateX(-180deg);
+    }
+    to {
+        transform: rotateX(0deg);
+    }
+}
+
+@keyframes retieRibbonLeft {
+    from {
+        transform: translateX(-120px) rotate(-12deg);
+        opacity: 0.2;
+    }
+    to {
+        transform: translateX(0) rotate(0);
+        opacity: 1;
+    }
+}
+
+@keyframes retieRibbonRight {
+    from {
+        transform: translateX(120px) rotate(12deg);
+        opacity: 0.2;
+    }
+    to {
+        transform: translateX(0) rotate(0);
+        opacity: 1;
+    }
+}
+
+@keyframes ravelBowLeft {
+    from {
+        transform: translateX(-30px) rotate(-60deg);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) rotate(0);
+        opacity: 1;
+    }
+}
+
+@keyframes ravelBowRight {
+    from {
+        transform: translateX(30px) rotate(60deg);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) rotate(0);
+        opacity: 1;
+    }
+}
+
+@keyframes growKnot {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes hideContent {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+}
+
+.envelope-container:not(.open) .ribbon-left {
+    animation: stretchRibbonLeft 2.5s ease-in-out infinite alternate;
+}
+
+.envelope-container:not(.open) .ribbon-right {
+    animation: stretchRibbonRight 2.5s ease-in-out infinite alternate;
+}
+
+
+.envelope-container:not(.open) .bow-left,
+.envelope-container:not(.open) .bow-right {
+    animation: wiggleBow 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes wiggleRibbon {
+    0% { transform: translateX(0) rotate(0); }
+    50% { transform: translateX(3px) rotate(2deg); }
+    100% { transform: translateX(-3px) rotate(-2deg); }
+}
+
+@keyframes wiggleBow {
+    0% { transform: translateX(0) rotate(0); }
+    50% { transform: translateX(2px) rotate(3deg); }
+    100% { transform: translateX(-2px) rotate(-3deg); }
+}
+
+.envelope-container:not(.open):hover {
+    transform: scale(1.03) rotate(1deg);
+}
+
+@keyframes stretchRibbonLeft {
+    0% { transform: translateX(0) rotate(0); }
+    50% { transform: translateX(-5px) rotate(-1deg); }
+    100% { transform: translateX(-12px) rotate(-3deg); }
+}
+
+@keyframes stretchRibbonRight {
+    0% { transform: translateX(0) rotate(0); }
+    50% { transform: translateX(5px) rotate(1deg); }
+    100% { transform: translateX(12px) rotate(3deg); }
+}
+
+
+
+        @keyframes openFlap {
+            to {
+                transform: rotateX(-180deg);
+            }
+        }
+
+        @keyframes untieRibbonLeft {
+            0% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translateX(-50px) rotate(-5deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateX(-120px) rotate(-12deg);
+                opacity: 0.2;
+            }
+        }
+
+        @keyframes untieRibbonRight {
+            0% {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            50% {
+                transform: translateX(50px) rotate(5deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateX(120px) rotate(12deg);
+                opacity: 0.2;
+            }
+        }
+
+        @keyframes unravelBowLeft {
+            0% {
+                transform: translateX(0) rotate(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(-30px) rotate(-60deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes unravelBowRight {
+            0% {
+                transform: translateX(0) rotate(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(30px) rotate(60deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes shrinkKnot {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0);
+                opacity: 0;
+            }
+        }
+
+        @keyframes revealContent {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+
+        /* Input Form Styles */
+        .input-field {
+            background-color: rgba(255,255,255,0.8);
+            border: 2px solid #e91e63;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin: 5px 0;
+            width: 100%;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #f06292;
+            box-shadow: 0 0 0 3px rgba(233,30,99,0.2);
+        }
+
+        .btn {
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #c2185b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+    
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        /* Share Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .share-link {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            width: 100%;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .social-icon:hover {
+            transform: scale(1.1);
+        }
+
+        /* Secret Question Styles */
+        .secret-question-container {
+            width: 100%;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .attempts-counter {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .attempts-counter span {
+            color: #e91e63;
+            font-weight: bold;
+        }
+
+        .answer-feedback {
+            margin-top: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            height: 20px;
+        }
+
+        .answer-feedback.correct {
+            color: #38b000;
+        }
+
+        .answer-feedback.incorrect {
+            color: #d90429;
+        }
+
+        .answer-hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        /* Lock icon animation */
+        .lock-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            transition: all 0.5s;
+        }
+
+        .lock-icon.unlocked {
+            transform: scale(1.2);
+        }
+
+        /* Shake animation for wrong answer */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease;
+        }
+
+        /* Heart animation */
+        .heart {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #e91e63;
+            transform: rotate(45deg);
+            opacity: 0;
+            z-index: 15;
+        }
+
+        .heart:before, .heart:after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: #e91e63;
+            border-radius: 50%;
+        }
+
+        .heart:before {
+            top: -10px;
+            left: 0;
+        }
+
+        .heart:after {
+            top: 0;
+            left: -10px;
+        }
+
+        @keyframes floatHeart {
+            0% { transform: rotate(45deg) translateY(0); opacity: 1; }
+            100% { transform: rotate(45deg) translateY(-100px); opacity: 0; }
+        }
+
+        /* Confetti Canvas */
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            .envelope-container {
+                width: 280px;
+                height: 192.5px;
+            }
+
+            .content {
+        font-size: inherit; /* Resets to default (desktop) size */
+    }
+
+            .envelope-container.recipient {
+                width: 300px;
+                height: 206.25px;
+            }
+
+            .input-field {
+                font-size: 14px;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+
+            .click-indicator {
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .envelope-container {
+                width: 240px;
+                height: 165px;
+            }
+
+            .envelope-container.recipient {
+                width: 260px;
+                height: 178.75px;
+            }
+
+            .content {
+                font-size: clamp(16px, 6vw, 20px);
+            }
+
+            .content {
+        font-size: inherit; /* Resets to default (desktop) size */
+    }
+        }
+
+                .signature {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: clamp(12px, 3vw, 14px);
+            font-family: 'Pacifico', cursive;
+            color: #d81b60;
+            opacity: 1;
+            z-index: 10;
+            pointer-events: none;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.5s ease;
+            }
+            .envelope-container.open .signature {
+            opacity: 0;
+            }
+
+            body {
+      background: linear-gradient(135deg, #ffdde1, #ee9ca7, #f8c7d0, #f0e1e1); /* Your custom gradient colors */
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      height: 100vh;
+      margin: 0;
+    }
+
+    /* Keyframes for smooth gradient transition */
+    @keyframes gradient {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+/* CSS for the Initial Star Burst Effect */
+.burst-particle {
+    position: absolute;
+    pointer-events: none; /* So they don't interfere with clicks */
+    z-index: 15; /* Above envelope content but below modals */
+    opacity: 0; /* Start invisible */
+    /* Star shape using clip-path */
+    width: 18px;
+    height: 18px;
+    background-color: #ffd700; /* Gold */
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+@keyframes starBurstAnimation {
+    0% {
+        opacity: 1;
+        transform: scale(0.3) rotate(0deg);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.2) rotate(180deg);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.5) rotate(360deg) translateY(-60px); /* Move upwards as it fades */
+    }
+}
+
+/* CSS for the Envelope Continuous Glow/Pulse Effect */
+.envelope-container.glowing {
+    /* Play infinitely, 3s total cycle (1.5s pulse + 1.5s pause) */
+    animation: envelopePulseContinuous 3s ease-in-out infinite;
+}
+
+@keyframes envelopePulseContinuous {
+    0%, 100% { /* Start and end of a full 3s cycle - no glow */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2),
+                    0 0 0px rgba(240, 98, 146, 0);
+    }
+    25% { /* Peak of the glow (at 0.75s into the 3s cycle) */
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25),
+                    0 0 25px 8px rgba(240, 98, 146, 0.6); /* Pink glow */
+    }
+    50% { /* Back to no glow - start of pause (at 1.5s into the 3s cycle) */
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2),
+                    0 0 0px rgba(240, 98, 146, 0);
+    }
+    /* From 50% to 100% it stays in the "no glow" state, creating a 1.5s pause */
+}
+
+    </style>
+</head>
+<body>
+    <div class="max-w-md w-full px-4">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="bg-white rounded-xl shadow-xl p-6 text-center">
+            <h1 class="text-3xl font-bold birthday-title mb-4">Birthday Card Creator</h1>
+            <p class="mb-6">Create a special birthday card with a secret message!</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="recipient-name" class="block text-left text-sm font-medium text-gray-700 mb-1">Recipient's Name:</label>
+                    <input type="text" id="recipient-name" class="input-field" placeholder="Enter name" value="">
+                </div>
+                
+                <div>
+                    <label for="birthday-message" class="block text-left text-sm font-medium text-gray-700 mb-1">Birthday Message:</label>
+                    <label for="birthday-message" class="block text-left text-sm font-small text-gray-700 mb-1">This message will be visible when user will answer the secret question.</label>
+                    <textarea id="birthday-message-input" class="input-field" rows="3" placeholder="Write your birthday wishes here...">Wishing you a wonderful birthday filled with joy, happiness.</textarea>
+                </div>
+                
+                <div>
+                    <label for="secret-question" class="block text-left text-sm font-medium text-gray-700 mb-1">Secret Question:</label>
+                    <input type="text" id="secret-question" class="input-field" placeholder="Enter a question only they would know" value="">
+                </div>
+                
+                <div>
+                    <label for="secret-answer" class="block text-left text-sm font-medium text-gray-700 mb-1">Secret Answer:</label>
+                    <input type="text" id="secret-answer" class="input-field" placeholder="Enter the answer to your question" value="">
+                </div>
+                
+                <button id="create-card-btn" class="btn w-full">Create Birthday Card</button>
+            </div>
+        </div>
+
+        <!-- Card Screen (Initially Hidden) -->
+        <div id="card-screen" class="hidden flex flex-col items-center justify-center">
+            
+            <div class="envelope-container mb-8" id="envelope">
+                <div class="signature" id="signature">from Sudhanshu</div>
+                <svg class="envelope" viewBox="0 0 320 220">
+    <defs>
+        <!-- Gradient for the ribbon -->
+        <linearGradient id="ribbonGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#e91e63"/>
+            <stop offset="50%" style="stop-color:#f06292"/>
+            <stop offset="100%" style="stop-color:#e91e63"/>
+        </linearGradient>
+
+        <!-- Filter for the main envelope body shadow -->
+        <filter id="filterEnvelopeShadow">
+            <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.15"/>
+        </filter>
+
+        <!-- Filter for the ribbon bands shadow -->
+        <filter id="filterRibbonShadow">
+            <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.2"/>
+        </filter>
+        
+        <!-- Filter for the bow loops shadow -->
+        <filter id="filterBowShadow">
+             <feDropShadow dx="0" dy="1" stdDeviation="1" flood-opacity="0.2"/>
+        </filter>
+    </defs>
+
+    <!-- Envelope Body -->
+    <!-- To match your 'desktop' image's pink body, you might change fill here. Current code is #fff8e1 (cream) -->
+    <rect x="0" y="0" width="320" height="220" rx="8" fill="#fff8e1" stroke="#c2185b" stroke-width="2" filter="url(#filterEnvelopeShadow)"/>
+    
+    <!-- Flap -->
+    <path class="flap" d="M0,0 L160,110 L320,0 Z" fill="#fff8e1" stroke="#c2185b" stroke-width="2"/>
+    
+    <!-- Ribbon Left -->
+    <path class="ribbon-left" d="M0,95 Q60,100 120,95 L155,95 Q160,100 155,105 L120,105 Q60,100 0,105 Z" fill="url(#ribbonGradient)" filter="url(#filterRibbonShadow)"/>
+    
+    <!-- Ribbon Right -->
+    <path class="ribbon-right" d="M320,95 Q260,100 200,95 L165,95 Q160,100 165,105 L200,105 Q260,100 320,105 Z" fill="url(#ribbonGradient)" filter="url(#filterRibbonShadow)"/>
+    
+    <!-- Bow -->
+    <g transform="translate(160, 100)">
+        <!-- Bow Left Loop -->
+        <path class="bow-left" d="M-35,-20 Q-60,0 -35,20 Q-25,15 -10,0 Q-25,-15 -35,-20 Z" fill="#ffd700" stroke="#f57f17" stroke-width="1.5" filter="url(#filterBowShadow)"/>
+        <!-- Bow Right Loop -->
+        <path class="bow-right" d="M35,-20 Q60,0 35,20 Q25,15 10,0 Q25,-15 35,-20 Z" fill="#ffd700" stroke="#f57f17" stroke-width="1.5" filter="url(#filterBowShadow)"/>
+        <!-- Bow Knot -->
+        <path class="bow-knot" d="M-12,-12 Q0,-10 12,-12 Q14,0 12,12 Q0,10 -12,12 Q-14,0 -12,-12 Z" fill="#e91e63" stroke="#ad1457" stroke-width="1"/>
+    </g>
+</svg>
+                <!-- <div class="click-indicator">Tap to Open</div> -->
+                <div class="content" id="birthday-message">Happy Birthday!</div>
+               
+            </div>
+
+            
+            
+            <div id="control-buttons" class="flex flex-wrap justify-center gap-3">
+                <button id="reveal-secret-btn" class="btn hidden">Reveal Secret Message</button>
+                <button id="close-envelope-btn" class="btn hidden">Close Envelope</button>
+                <button id="share-btn" class="btn bg-blue-500 hover:bg-blue-600">Share Card</button>
+                <button id="reset-btn" class="btn bg-gray-500 hover:bg-gray-600">Create New Card</button>
+            </div>
+        </div>
+        
+        <!-- Share Modal -->
+        <div id="share-modal" class="modal">
+            <div class="modal-content">
+                <h3 class="text-xl font-bold mb-4">Share Birthday Card</h3>
+                <p class="text-sm text-gray-600 mb-2">Copy this link to share your birthday card:</p>
+                <input type="text" id="share-link" class="share-link" readonly>
+                <button id="copy-link-btn" class="btn w-full mb-4">Copy Link</button>
+                
+                <p class="text-sm text-gray-600 mb-2">Or share directly:</p>
+                <div class="social-icons">
+                    <div class="social-icon" style="background-color: #1877f2;" id="share-facebook">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951z"/>
+                        </svg>
+                    </div>
+                    <div class="social-icon" style="background-color: #1da1f2;" id="share-twitter">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M5.026 15c6.038 0 9.341-5.003 9.341-9.334 0-.14 0-.282-.006-.422A6.685 6.685 0 0 0 16 3.542a6.658 6.658 0 0 1-1.889.518 3.301 3.301 0 0 0 1.447-1.817 6.533 6.533 0 0 1-2.087.793A3.286 3.286 0 0 0 7.875 6.03a9.325 9.325 0 0 1-6.767-3.429 3.289 3.289 0 0 0 1.018 4.382A3.323 3.323 0 0 1 .64 6.575v.045a3.288 3.288 0 0 0 2.632 3.218 3.203 3.203 0 0 1-.865.115 3.23 3.23 0 0 1-.614-.057 3.283 3.283 0 0 0 3.067 2.277A6.588 6.588 0 0 1 .78 13.58a6.32 6.32 0 0 1-.78-.045A9.344 9.344 0 0 0 5.026 15z"/>
+                        </svg>
+                    </div>
+                    <div class="social-icon" style="background-color: #25D366;" id="share-whatsapp">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.557 1.794 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+                        </svg>
+                    </div>
+                    <div class="social-icon" style="background-color: #0077b5;" id="share-linkedin">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <button id="close-modal-btn" class="btn bg-gray-500 hover:bg-gray-600 w-full mt-6">Close</button>
+            </div>
+        </div>
+        
+        <!-- Secret Question Modal -->
+        <div id="secret-question-modal" class="modal">
+            <div class="modal-content">
+                <div class="text-center">
+                    <div class="lock-icon mx-auto" id="lock-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#e91e63">
+                            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>
+                        </svg>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold mb-3">Unlock Your Secret Message</h3>
+                    <p class="text-sm text-gray-600 mb-4"> Just answer this question if you remember?</p>
+                    <p  id="question-display">What is my favorite color?</p>
+                    
+                    <input type="text" id="answer-input" class="input-field text-center" placeholder="Your answer...">
+                    <button id="check-answer-btn" class="btn w-full">Unlock Message</button>
+                    
+                    <div class="attempts-counter mt-3">
+                        Attempts remaining: <span id="attempts-counter">3</span>
+                    </div>
+                    
+                    <div id="answer-feedback" class="answer-feedback mt-2"></div>
+                    <div id="answer-hint" class="answer-hint hidden mt-2"></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Confetti Canvas -->
+        <canvas id="confetti-canvas"></canvas>
+        
+    </div>
+    
+
+    <script>
+        // DOM Elements
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const cardScreen = document.getElementById('card-screen');
+        const createCardBtn = document.getElementById('create-card-btn');
+        const recipientNameInput = document.getElementById('recipient-name');
+        const birthdayMessageInput = document.getElementById('birthday-message-input');
+        const secretQuestionInput = document.getElementById('secret-question');
+        const secretAnswerInput = document.getElementById('secret-answer');
+        const envelope = document.getElementById('envelope');
+        const birthdayMessage = document.getElementById('birthday-message');
+        const revealSecretBtn = document.getElementById('reveal-secret-btn');
+        const closeEnvelopeBtn = document.getElementById('close-envelope-btn');
+        const shareBtn = document.getElementById('share-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const shareModal = document.getElementById('share-modal');
+        const shareLink = document.getElementById('share-link');
+        const copyLinkBtn = document.getElementById('copy-link-btn');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const shareFacebook = document.getElementById('share-facebook');
+        const shareTwitter = document.getElementById('share-twitter');
+        const shareWhatsapp = document.getElementById('share-whatsapp');
+        const shareLinkedin = document.getElementById('share-linkedin');
+        const controlButtons = document.getElementById('control-buttons');
+        const secretQuestionModal = document.getElementById('secret-question-modal');
+        const questionDisplay = document.getElementById('question-display');
+        const answerInput = document.getElementById('answer-input');
+        const checkAnswerBtn = document.getElementById('check-answer-btn');
+        const attemptsCounter = document.getElementById('attempts-counter');
+        const answerFeedback = document.getElementById('answer-feedback');
+        const answerHint = document.getElementById('answer-hint');
+        const lockIcon = document.getElementById('lock-icon');
+
+        // Store card data
+        let cardData = {
+            name: '',
+            message: '',
+            question: '',
+            answer: ''
+        };
+
+        // Track states
+        let remainingAttempts = 3;
+        let isSharedView = false;
+        let messageUnlocked = false;
+        let envelopeOpened = false;
+        let isAnimating = false;
+
+        // Encryption functions
+        function encryptParam(param) {
+            return btoa(encodeURIComponent(param));
+        }
+
+        function decryptParam(param) {
+            try {
+                return decodeURIComponent(atob(param));
+            } catch (e) {
+                console.error('Decryption error:', e);
+                return '';
+            }
+        }
+
+
+
+        // Create confetti animation
+        function createConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const myConfetti = confetti.create(canvas, { 
+                resize: true, 
+                useWorker: true 
+            });
+            myConfetti({ 
+                particleCount: 100, 
+                spread: 70, 
+                origin: { y: 0.6 },
+                colors: ['#ff1744', '#ffd700', '#2196f3', '#4caf50'],
+                shapes: ['circle', 'square', 'star'],
+                scalar: 1.2
+            });
+            setTimeout(() => myConfetti({ 
+                particleCount: 50, 
+                spread: 100, 
+                origin: { x: 0.1, y: 0.5 } 
+            }), 250);
+            setTimeout(() => myConfetti({ 
+                particleCount: 50, 
+                spread: 100, 
+                origin: { x: 0.9, y: 0.5 } 
+            }), 400);
+        }
+
+        // Create floating hearts
+        function createFloatingHearts() {
+            const container = envelope;
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.className = 'heart';
+                    heart.style.left = `${Math.random() * 80 + 10}%`;
+                    heart.style.bottom = '10px';
+                    const duration = 1 + Math.random() * 2;
+                    heart.style.animation = `floatHeart ${duration}s ease-out forwards`;
+                    container.appendChild(heart);
+                    setTimeout(() => heart.remove(), duration * 1000);
+                }, i * 300);
+            }
+        }
+
+        function launchInitialStarBurst() {
+    const container = document.getElementById('envelope'); // Or target birthdayMessage for closer proximity
+    if (!container) return;
+
+    const numStars = 8; // How many stars in the burst
+
+    for (let i = 0; i < numStars; i++) {
+        const star = document.createElement('div');
+        star.className = 'burst-particle';
+
+        // Position them around the center of the envelope, they will animate from there
+        const angle = (i / numStars) * Math.PI * 2; // Distribute stars in a circle
+        const radius = 10 + Math.random() * 20; // Random initial distance from center
+
+        const initialX = Math.cos(angle) * radius;
+        const initialY = Math.sin(angle) * radius;
+
+        // Centering within the envelope container
+        star.style.left = `calc(50% + ${initialX}px - 9px)`; // Adjust for star width/2
+        star.style.top = `calc(50% + ${initialY}px - 9px - 10px)`; // Adjust for star height/2 & slightly above center
+
+        // Animation properties
+        const duration = 0.6 + Math.random() * 0.4; // 0.6s to 1.0s
+        const delay = Math.random() * 0.2;         // Stagger start times slightly
+
+        star.style.animation = `starBurstAnimation ${duration}s ${delay}s ease-out forwards`;
+
+        container.appendChild(star);
+
+        // Clean up the star element after its animation
+        setTimeout(() => {
+            if (star.parentNode) {
+                star.parentNode.removeChild(star);
+            }
+        }, (duration + delay) * 1000 + 100); // Remove after animation + buffer
+    }
+}
+
+        // Toggle envelope open/close
+                function toggleEnvelope() {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            if (envelopeOpened) {
+                // ----- START CLOSING -----
+                envelope.classList.remove('open');
+                envelope.classList.add('closing');
+                envelope.classList.remove('glowing'); // Remove glowing class when closing
+
+                // --- Key change for content hiding ---
+                // Reset any previous animation states on birthdayMessage and apply hideContent
+                birthdayMessage.style.animation = 'none'; // Clear any inline animation from 'revealContent'
+                // Force a reflow - this is a trick to make sure the browser picks up the new animation
+                // eslint-disable-next-line no-unused-expressions
+                birthdayMessage.offsetHeight; // Reading offsetHeight forces a reflow
+                birthdayMessage.style.animation = ''; // Remove our inline 'none' so CSS class can apply
+
+                // The class ".envelope-container.closing .content" should now apply 'hideContent'
+                // The 'hideContent' animation itself handles opacity and transform.
+                // No need to manually set birthdayMessage.style.opacity = '0' here.
+                // --- End of key change ---
+
+                revealSecretBtn.classList.add('hidden');
+                closeEnvelopeBtn.classList.add('hidden');
+                envelopeOpened = false;
+
+                setTimeout(() => {
+                    envelope.classList.remove('closing');
+                    isAnimating = false;
+                    // Reset text and ensure it's fully hidden AFTER closing animation
+                    birthdayMessage.textContent = `Happy Birthday, ${cardData.name}!`;
+                    birthdayMessage.style.opacity = '0';
+                    birthdayMessage.style.animation = ''; // Clean up for next open
+                }, 800); // Match the duration of the longest closing animation part
+
+            } else {
+                // ----- START OPENING -----
+                envelope.classList.remove('closing');
+                envelope.classList.add('open');
+
+                // Reset content state before opening animation applies
+                birthdayMessage.style.opacity = '0';
+                birthdayMessage.style.animation = 'none';
+                // eslint-disable-next-line no-unused-expressions
+                birthdayMessage.offsetHeight;
+                birthdayMessage.style.animation = '';
+
+
+                if (messageUnlocked || !isSharedView) {
+                    birthdayMessage.textContent = cardData.message;
+                } else {
+                    birthdayMessage.textContent = `Happy Birthday, ${cardData.name}!`;
+                }
+                // The CSS rule ".envelope-container.open .content" will take care of the reveal animation.
+
+                setTimeout(() => {
+                    envelope.classList.add('glowing');
+                    revealSecretBtn.classList.remove('hidden');
+                    closeEnvelopeBtn.classList.remove('hidden');
+                    envelopeOpened = true;
+                    isAnimating = false;
+                }, 2300); // Message fully visible
+            }
+        }
+        // Show secret question modal
+        function showSecretQuestionModal() {
+            secretQuestionModal.classList.add('active');
+            answerInput.focus();
+        }
+
+        // Hide secret question modal
+        function hideSecretQuestionModal() {
+            secretQuestionModal.classList.remove('active');
+            answerInput.value = '';
+            answerFeedback.textContent = '';
+        }
+
+        // Reveal the birthday message
+        function revealMessage() {
+            messageUnlocked = true;
+            hideSecretQuestionModal();
+            birthdayMessage.textContent = cardData.message;
+            birthdayMessage.style.opacity = '0';
+            birthdayMessage.style.animation = 'none';
+            setTimeout(() => {
+                birthdayMessage.style.opacity = '1';
+                birthdayMessage.style.animation = 'revealContent 0.5s ease-in-out forwards';
+                createConfetti();
+                createFloatingHearts();
+            }, 100);
+        }
+
+        // Check the answer
+        function checkAnswer() {
+            const userAnswer = answerInput.value.toLowerCase().trim();
+            const correctAnswer = cardData.answer.toLowerCase().trim();
+            if (userAnswer === correctAnswer) {
+                answerFeedback.textContent = "Correct! Unlocking your message...";
+                answerFeedback.className = "answer-feedback correct";
+                lockIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#38b000"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h2c0-1.66 1.34-3 3-3s3 1.34 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>`;
+                lockIcon.classList.add('unlocked');
+                setTimeout(revealMessage, 1500);
+            } else {
+                remainingAttempts--;
+                attemptsCounter.textContent = remainingAttempts;
+                const modalContent = secretQuestionModal.querySelector('.modal-content');
+                modalContent.classList.add('shake');
+                setTimeout(() => modalContent.classList.remove('shake'), 500);
+                answerFeedback.textContent = "That's not right. Try again!";
+                answerFeedback.className = "answer-feedback incorrect";
+                if (remainingAttempts === 1) {
+                    const hintText = `Hint: ${correctAnswer.charAt(0)}${correctAnswer.slice(1).replace(/[a-zA-Z0-9]/g, '*')}`;
+                    answerHint.textContent = hintText;
+                    answerHint.classList.remove('hidden');
+                } else if (remainingAttempts === 0) {
+                    answerFeedback.textContent = `The answer was: ${correctAnswer}`;
+                    lockIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#d90429"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h2c0-1.66 1.34-3 3-3s3 1.34 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 12H6V10h12v10z"/></svg>`;
+                    setTimeout(revealMessage, 2000);
+                }
+            }
+        }
+
+        // Generate shareable link
+        function generateShareableLink() {
+            const baseUrl = window.location.href.split('?')[0];
+            const params = new URLSearchParams();
+            params.append('name', encryptParam(cardData.name));
+            params.append('message', encryptParam(cardData.message));
+            params.append('question', encryptParam(cardData.question));
+            params.append('answer', encryptParam(cardData.answer));
+            params.append('shared', 'true');
+            return `${baseUrl}?${params.toString()}`;
+        }
+
+        // Check for URL parameters
+        function checkUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const name = urlParams.get('name');
+            const message = urlParams.get('message');
+            const question = urlParams.get('question');
+            const answer = urlParams.get('answer');
+            const shared = urlParams.get('shared');
+            if (name && message && question && answer) {
+                cardData.name = decryptParam(name);
+                cardData.message = decryptParam(message);
+                cardData.question = decryptParam(question);
+                cardData.answer = decryptParam(answer);
+
+                 if (cardData.name) { // Ensure name was successfully decrypted
+                    document.title = `A Birthday Surprise for ${cardData.name}!`; // <-- ADD THIS
+                } else {
+                    document.title = 'Interactive Birthday Card'; // Fallback if name is missing
+                }
+              //  console.log('Decrypted name:', cardData.name);
+              //  console.log('Decrypted message:', cardData.message);
+              //  console.log('Decrypted question:', cardData.question);
+              //  console.log('Decrypted answer:', cardData.answer);
+                birthdayMessage.textContent = `Happy Birthday, ${cardData.name}!`;
+                questionDisplay.textContent = cardData.question;
+                welcomeScreen.classList.add('hidden');
+                cardScreen.classList.remove('hidden');
+                cardScreen.style.display = 'flex';
+                if (shared === 'true') {
+                    isSharedView = true;
+                    shareBtn.classList.add('hidden');
+                    resetBtn.classList.add('hidden');
+                    envelope.classList.add('recipient');
+                    // setTimeout(toggleEnvelope, 1000);
+                }
+            }
+        }
+
+        // Create card function
+        function createCard() {
+            if (!recipientNameInput.value.trim()) return alert("Please enter the recipient's name.");
+            if (!birthdayMessageInput.value.trim()) return alert("Please enter a birthday message.");
+            if (!secretQuestionInput.value.trim()) return alert("Please enter a secret question.");
+            if (!secretAnswerInput.value.trim()) return alert("Please enter the answer to your secret question.");
+            cardData.name = recipientNameInput.value.trim();
+            cardData.message = birthdayMessageInput.value.trim();
+            cardData.question = secretQuestionInput.value.trim();
+            cardData.answer = secretAnswerInput.value.trim();
+            document.title = `Card for ${cardData.name} - Preview`; // <-- ADD THIS
+           // console.log('Created card with:', cardData);
+            birthdayMessage.textContent = `Happy Birthday, ${cardData.name}!`;
+            questionDisplay.textContent = cardData.question;
+            welcomeScreen.classList.add('hidden');
+            cardScreen.classList.remove('hidden');
+            cardScreen.style.display = 'flex';
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            createCardBtn.addEventListener('click', createCard);
+            createCardBtn.addEventListener('touchend', (e) => { e.preventDefault(); createCard(); });
+            createCardBtn.style.cursor = 'pointer';
+            checkUrlParams();
+        });
+
+        envelope.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleEnvelope();
+        });
+
+        revealSecretBtn.addEventListener('click', () => {
+            if (isSharedView && !messageUnlocked) {
+                showSecretQuestionModal();
+            } else {
+                revealMessage();
+            }
+        });
+
+        closeEnvelopeBtn.addEventListener('click', toggleEnvelope);
+
+        resetBtn.addEventListener('click', () => {
+            document.title = 'Interactive Birthday Card'; // <-- ADD THIS            
+            envelope.classList.remove('open');
+            revealSecretBtn.classList.add('hidden');
+            closeEnvelopeBtn.classList.add('hidden');
+            shareBtn.classList.remove('hidden');
+            resetBtn.classList.remove('hidden');
+            recipientNameInput.value = '';
+            birthdayMessageInput.value = '';
+            secretQuestionInput.value = '';
+            secretAnswerInput.value = '';
+            answerInput.value = '';
+            answerFeedback.textContent = '';
+            answerHint.textContent = '';
+            answerHint.classList.add('hidden');
+            remainingAttempts = 3;
+            attemptsCounter.textContent = remainingAttempts;
+            messageUnlocked = false;
+            envelopeOpened = false;
+            birthdayMessage.style.opacity = '0';
+            birthdayMessage.style.animation = 'none';
+            lockIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#e91e63"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/></svg>`;
+            lockIcon.classList.remove('unlocked');
+            window.history.replaceState({}, document.title, window.location.pathname);
+            cardScreen.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+            isAnimating = false;
+        });
+
+        checkAnswerBtn.addEventListener('click', checkAnswer);
+        answerInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') checkAnswer(); });
+
+        shareBtn.addEventListener('click', () => {
+            const link = generateShareableLink();
+            shareLink.value = link;
+            shareModal.classList.add('active');
+        });
+
+        copyLinkBtn.addEventListener('click', () => {
+            shareLink.select();
+            document.execCommand('copy');
+            copyLinkBtn.textContent = 'Copied!';
+            setTimeout(() => copyLinkBtn.textContent = 'Copy Link', 2000);
+        });
+
+        closeModalBtn.addEventListener('click', () => shareModal.classList.remove('active'));
+
+        shareFacebook.addEventListener('click', () => {
+            const url = encodeURIComponent(shareLink.value);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        });
+
+        shareTwitter.addEventListener('click', () => {
+            const url = encodeURIComponent(shareLink.value);
+            const text = encodeURIComponent(`Check out this birthday card for ${cardData.name}!`);
+            window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+        });
+
+        shareWhatsapp.addEventListener('click', () => {
+            const url = encodeURIComponent(shareLink.value);
+            const text = encodeURIComponent(`Check out this birthday card for ${cardData.name}!`);
+            window.open(`https://wa.me/?text=${text} ${url}`, '_blank');
+        });
+
+        shareLinkedin.addEventListener('click', () => {
+            const url = encodeURIComponent(shareLink.value);
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (e.target === shareModal) shareModal.classList.remove('active');
+            if (e.target === secretQuestionModal) hideSecretQuestionModal();
+        });
+    </script>
+    
+</body>
+</html>
