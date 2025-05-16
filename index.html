@@ -741,30 +741,30 @@
 <body>
     <div class="max-w-md w-full px-4">
         <!-- Welcome Screen -->
-        <div id="welcome-screen" class="bg-white rounded-xl shadow-xl p-6 text-center">
+        <div id="welcome-screen" class="p-6 md:p-8 mb-6 mt-6 rounded-xl shadow-xl bg-white">
             <h1 class="text-3xl font-bold birthday-title mb-4">Birthday Card Creator</h1>
             <p class="mb-6">Create a special birthday card with a secret message!</p>
             
             <div class="space-y-4">
                 <div>
                     <label for="recipient-name" class="block text-left text-sm font-medium text-gray-700 mb-1">Recipient's Name:</label>
-                    <input type="text" id="recipient-name" class="input-field" placeholder="Enter name" value="">
+                    <input type="text" id="recipient-name" class="input-field text-base" placeholder="Enter name" value="">
                 </div>
                 
                 <div>
                     <label for="birthday-message" class="block text-left text-sm font-medium text-gray-700 mb-1">Birthday Message:</label>
                     <label for="birthday-message" class="block text-left text-[10px] font-extralight text-gray-700 mb-1">This message will be visible when user will answer the secret question.</label>
-                    <textarea id="birthday-message-input" class="input-field" rows="3" placeholder="Write your birthday wishes here...">Wishing you a wonderful birthday filled with joy, happiness.</textarea>
+                    <textarea id="birthday-message-input" class="input-field text-base" rows="3" placeholder="Write your birthday wishes here...">Wishing you a wonderful birthday filled with joy, happiness.</textarea>
                 </div>
                 
                 <div>
                     <label for="secret-question" class="block text-left text-sm font-medium text-gray-700 mb-1">Secret Question:</label>
-                    <input type="text" id="secret-question" class="input-field" placeholder="Enter a question only they would know" value="">
+                    <input type="text" id="secret-question" class="input-field text-base" placeholder="Enter a question only they would know" value="">
                 </div>
                 
                 <div>
                     <label for="secret-answer" class="block text-left text-sm font-medium text-gray-700 mb-1">Secret Answer:</label>
-                    <input type="text" id="secret-answer" class="input-field" placeholder="Enter the answer to your question" value="">
+                    <input type="text" id="secret-answer" class="input-field text-base" placeholder="Enter the answer to your question" value="">
                 </div>
                 
                 <button id="create-card-btn" class="btn w-full">Create Birthday Card</button>
